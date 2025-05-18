@@ -9,8 +9,9 @@ En esta entrega se planificó la base del proyecto, definiéndola en **4 etapas 
 	 4.    [_**Actores y Diagrama de Casos de Uso.**_](https://github.com/IvanChiPolanco/Proyecto-Programacion-Estructurada/blob/ffd5f75ff1a28ebc475a275fab080fae06596150/reqSistema/casosdeUso.md)
 	 5.    [**Elaborar las principales interfaces de usuario.**](https://github.com/IvanChiPolanco/Proyecto-Programacion-Estructurada/blob/ffd5f75ff1a28ebc475a275fab080fae06596150/reqSistema/interfaces.md)
  - ***Mapeo de Requerimientos***
-	 1.    **Describir, en forma clara, los principales requerimientos funcionales y no funcionales del sistema.**
-	2.  **Elaborar los casos de uso para cada funcionalidad, donde se describa el proceso y las rutas de acción alternativas.**
+	 1.    [**Requerimientos Funcionales.**](https://github.com/IvanChiPolanco/Proyecto-Programacion-Estructurada/blob/80efe752314c0180c90447375130a6c40c484aef/mapeoReqs/reqsFuncionales.md)
+	2.  **Requerimientos No Funcionales.**
+	3. **Casos De Uso.**
  - ***Definición del estándar de codificación.***
 	 1.   **Definición clara y específica sobre el estándar que utilizará el equipo de trabajo, debe incluir el uso de nombrado de variables, macros, funciones, archivos, bibliotecas, uso de comentarios, así como la información que contendrá cada bloque de comentarios y la justificación de la selección.**
  - ***Proceso de Desarrollo***
