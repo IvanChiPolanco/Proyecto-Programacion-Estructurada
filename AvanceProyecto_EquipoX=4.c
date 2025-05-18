@@ -1,10 +1,10 @@
 /*
 Equipo X = 4;
-Chi Polanco Ivan Alejandro, Castillo Manchado Oswaldo, Osorio Muñoz Jaime Armando, Dzib Pech Luis Gilberto
-Implementación de Videojuegos de Rol por Turnos en C "Dungeons-C"
+Castillo Manchado Oswaldo, Chi Polanco Ivan Alejandro, Dzib Pech Luis Gilberto, Osorio MuÃ±oz Jaime Armando
+Implementaciï¿½n de Videojuegos de Rol por Turnos en C "Dungeons-C"
 Compilador: Zinjai
 Ver. 1.0
-12 de Mayo de 2025
+18 de Mayo de 2025
 */
 
 #include <stdio.h>
@@ -13,134 +13,261 @@ Ver. 1.0
 #include <time.h> /* Para inicializar la semilla de aleatoriedad */
 #include <locale.h>
 
-#define EXPERIENCIA_SUBIR_NIVEL   (20)
-#define INCREMENTO_ATAQUE         (2)
-#define INCREMENTO_DEFENSA        (1)
-#define INCREMENTO_VIDA           (10)
+/* === Mapeo del juego === */
+char mapa[FILAS][COLS+1] = {
+	"#########################",
+		"#P    #    #   #     #  #",
+		"# ## ##### ### # ### # ##",
+		"#    #     #   # #   #  #",
+		"#### # ####### # ### ####",
+		"#  #   #         #      #",
+		"#  ### #######  ####### #",
+		"#   #     #     #      J#",
+		"### ##### # ##### #######",
+		"#     #   #   #         #",
+		"# ### ### ### ######## ##",
+		"#   #     #   #        F#",
+		"# ### ####### ###########",
+		"#            J          #",
+		"#########################"
+};
 
-/* Estructura que define al personaje */
+
+int jugador_x = 1, jugador_y = 1;
+int monedas = 0;
+
+/* === Estructura que define al personaje=== */
 typedef struct {
 	char nombre[30];
 	int vida, ataque, defensa, experiencia, nivel;
+	int ataque_extra;
+	int defensa_extra;
+	int pociones_vida;
+	int pociones_ataque;
+	int pociones_defensa;
 } personaje_t;
-
-/* Estructura que define al enemigo */
+/* === Estructura que define al enemigo=== */
 typedef struct {
-	char nombre[30];
+	char nombre[40];
 	int vida, ataque, defensa;
 } enemigo_t;
+/* === Estructura que define mejoras del personaje=== */
+typedef struct {
+	char nombre[30];
+	int mejora_ataque;
+	int mejora_defensa;
+	int cura_vida;
+	int costo;
+	int tipo; // 1 = arma/armadura, 2 = consumible
+} objeto_t;
 
-/* Mostrar estadísticas del personaje */
-void mostrar_estadisticas(personaje_t personaje) {
-	printf("\n--- %s ---\n", personaje.nombre);
-	printf("Vida: %d\nAtaque: %d\nDefensa: %d\nExperiencia: %d\nNivel: %d\n",
-		   personaje.vida, personaje.ataque, personaje.defensa,
-		   personaje.experiencia, personaje.nivel);
+/* === Lista de enemigos y jefes === */
+const enemigo_t enemigos_normales[] = {
+	{"Goblin", 20, 5, 2},
+{"Kobold", 18, 6, 1},
+	{"Gnoll", 25, 7, 3},
+{"Arania Gigante", 24, 6, 2},
+	{"Orco", 28, 10, 2},
+{"Esqueleto", 22, 6, 2},
+};
+const int num_enemigos = sizeof(enemigos_normales)/sizeof(enemigos_normales[0]);
+
+enemigo_t jefe_intermedio() {
+	int selector = rand() % 2;
+	if (selector == 0)
+		return (enemigo_t){"Ogro de Guerra", 100, 40, 6};
+	else
+		return (enemigo_t){"Beholder", 90, 50, 5}; 
 }
 
-/* Generar enemigo con atributos aleatorios */
-enemigo_t generar_enemigo() {
-	enemigo_t enemigo;
-	strcpy(enemigo.nombre, "Goblin salvaje");
-	enemigo.vida = rand() % 20 + 10;
-	enemigo.ataque = rand() % 5 + 3;
-	enemigo.defensa = rand() % 3 + 1;
-	return enemigo;
+enemigo_t jefe_final() {
+	return (enemigo_t){"Lich Supremo", 300, 70, 30};
 }
 
-/* Subir de nivel al personaje */
-personaje_t subir_nivel(personaje_t jugador) {
-	if (jugador.experiencia >= EXPERIENCIA_SUBIR_NIVEL) {
-		jugador.nivel++;
-		jugador.ataque += INCREMENTO_ATAQUE;
-		jugador.defensa += INCREMENTO_DEFENSA;
-		jugador.vida += INCREMENTO_VIDA;
-		jugador.experiencia = 0;
-		printf("\u00a1Subiste a nivel %d!\n", jugador.nivel);
+/* === Objetos de tienda === */
+const objeto_t tienda[MAX_OBJETOS] = {
+	{"Espada corta", 6, 0, 0, 10, 1},
+{"Escudo madera", 0, 6, 0, 10, 1},
+	{"Hacha orca", 7, 0, 0, 20, 1},
+{"Armadura ligera", 0, 10, 0, 40, 1},
+	{"Espada larga", 8, 1, 0, 35, 1},
+{"Pocion vida", 0, 0, 20, 20, 2},
+	{"Pocion ataque", 4, 0, 0, 15, 2},
+{"Pocion defensa", 0, 4, 0, 15, 2}
+};
+
+/* === Funcion para moverte en el mapa === */
+void mostrar_mapa() {
+	for (int i = 0; i < FILAS; i++) {
+		for (int j = 0; j < COLS; j++) {
+			if (i == jugador_x && j == jugador_y) printf("P");
+			else printf("%c", mapa[i][j]);
+		}
+		printf("\n");
 	}
-	return jugador;
 }
-
-/* Proceso de combate entre jugador y enemigo */
+/* === Mostrar estadÃ­sticas del personaje ===*/
+void mostrar_estadisticas(personaje_t pj) {
+	printf("\n--- %s ---\n", pj.nombre);
+	printf("Vida: %d\nAtaque: %d (+%d)\nDefensa: %d (+%d)\nNivel: %d\nMonedas: %d\nPociones (vida:%d ataque:%d defensa:%d)\n",
+		   pj.vida, pj.ataque, pj.ataque_extra, pj.defensa, pj.defensa_extra, pj.nivel, monedas,
+		   pj.pociones_vida, pj.pociones_ataque, pj.pociones_defensa);
+}
+/* === Generar enemigo con atributos aleatorios ===*/
+enemigo_t generar_enemigo_aleatorio() {
+	return enemigos_normales[rand() % num_enemigos];
+}
+/* === Usar consumibles ===*/
+personaje_t usar_consumible(personaje_t *pj) {
+	int op;
+	printf("1. Usar pocion de vida\n2. Usar pocion de ataque\n3. Usar pocion de defensa\n4. Cancelar\n> ");
+	scanf("%d", &op);
+	switch (op) {
+	case 1:
+		if (pj->pociones_vida > 0) {
+			pj->vida += 20;
+			pj->pociones_vida--;
+			printf("Te curaste 20 puntos.\n");
+		}
+		break;
+	case 2:
+		if (pj->pociones_ataque > 0) {
+			pj->ataque_extra += 2;
+			pj->pociones_ataque--;
+			printf("Tu ataque aumento.\n");
+		}
+		break;
+	case 3:
+		if (pj->pociones_defensa > 0) {
+			pj->defensa_extra += 2;
+			pj->pociones_defensa--;
+			printf("Tu defensa aumento.\n");
+		}
+		break;
+	}
+	return *pj;
+}
+/* === Funcion Tienda ===*/
+void tienda_objetos(personaje_t *pj) {
+	int op;
+	printf("\n=== TIENDA ===\n");
+	for (int i = 0; i < MAX_OBJETOS; i++) {
+		printf("%d. %s (Atk+%d Def+%d Vida+%d) - %d monedas\n", i+1,
+			   tienda[i].nombre, tienda[i].mejora_ataque, tienda[i].mejora_defensa,
+			   tienda[i].cura_vida, tienda[i].costo);
+	}
+	printf("0. Cancelar\n> ");
+	scanf("%d", &op);
+	if (op >= 1 && op <= MAX_OBJETOS) {
+		objeto_t obj = tienda[op-1];
+		if (monedas >= obj.costo) {
+			monedas -= obj.costo;
+			if (obj.tipo == 1) {
+				pj->ataque_extra += obj.mejora_ataque;
+				pj->defensa_extra += obj.mejora_defensa;
+				printf("Compraste y equipaste %s.\n", obj.nombre);
+			} else {
+				if (obj.cura_vida > 0) pj->pociones_vida++;
+				else if (obj.mejora_ataque > 0) pj->pociones_ataque++;
+				else if (obj.mejora_defensa > 0) pj->pociones_defensa++;
+				printf("Compraste una %s.\n", obj.nombre);
+			}
+		} else printf("No tienes suficientes monedas.\n");
+	}
+}
+/* === Proceso de combate entre jugador y enemigo ===*/
 personaje_t combatir(personaje_t jugador, enemigo_t enemigo) {
-	printf("\n\u00a1Un %s aparece!\n", enemigo.nombre);
-	
+	printf("\n\u00a1Te enfrentas al %s!\n", enemigo.nombre);
 	while (jugador.vida > 0 && enemigo.vida > 0) {
 		printf("\nTu vida: %d | Vida del %s: %d\n", jugador.vida, enemigo.nombre, enemigo.vida);
-		printf("1. Atacar\n2. Huir\nElige una opcion: ");
-		
-		int opcion = 0;
-		scanf("%d", &opcion);
-		
-		if (opcion == 1) {
-			int danio_jugador = jugador.ataque - enemigo.defensa;
-			if (danio_jugador < 1) danio_jugador = 1;
-			enemigo.vida -= danio_jugador;
-			printf("Le hiciste %d de danio al %s.\n", danio_jugador, enemigo.nombre);
-			
-			if (enemigo.vida <= 0) {
-				printf("\u00a1Has derrotado al %s!\n", enemigo.nombre);
-				jugador.experiencia += 10;
-				jugador = subir_nivel(jugador);
-				break;
-			}
-			
-			int danio_enemigo = enemigo.ataque - jugador.defensa;
-			if (danio_enemigo < 1) danio_enemigo = 1;
-			jugador.vida -= danio_enemigo;
-			printf("El %s te hizo %d de danio.\n", enemigo.nombre, danio_enemigo);
-			
-		} else if (opcion == 2) {
-			printf("\u00a1Huiste del combate!\n");
-			break;
-		} else {
-			printf("Opcion invalida.\n");
+		printf("1. Atacar\n2. Usar pocion\n> ");
+		int op;
+		scanf("%d", &op);
+		if (op == 1) {
+			int dmg = (jugador.ataque + jugador.ataque_extra) - enemigo.defensa;
+			if (dmg < 1) dmg = 1;
+			enemigo.vida -= dmg;
+			printf("Le hiciste %d de danio.\n", dmg);
+		} else if (op == 2) {
+			jugador = usar_consumible(&jugador);
+			continue;
+		}
+		if (enemigo.vida > 0) {
+			int dmg = enemigo.ataque - (jugador.defensa + jugador.defensa_extra);
+			if (dmg < 1) dmg = 1;
+			jugador.vida -= dmg;
+			printf("El %s te hizo %d de danio.\n", enemigo.nombre, dmg);
 		}
 	}
-	
-	if (jugador.vida <= 0) {
-		printf("\nHas sido derrotado. Game Over.\n");
+	if (jugador.vida > 0) {
+		printf("\u00a1Has ganado!\n");
+		monedas += 10 + rand() % 10;
+	} else {
+		printf("Has muerto. Game Over.\n");
 	}
-	
 	return jugador;
 }
 
-/* Función principal */
+/* === Funcion principal === */
 int main() {
 	setlocale(LC_ALL, "");
 	srand(time(NULL));
 	
-	personaje_t jugador = { .vida = 30, .ataque = 8, .defensa = 3, .experiencia = 0, .nivel = 1 };
+	personaje_t jugador;
+	jugador.vida = 30;
+	jugador.ataque = 8;
+	jugador.defensa = 4;
+	jugador.experiencia = 0;
+	jugador.nivel = 1;
+	jugador.ataque_extra = 0;
+	jugador.defensa_extra = 0;
+	jugador.pociones_vida = 1;
+	jugador.pociones_ataque = 1;
+	jugador.pociones_defensa = 1;
 	
-	printf("Ingresa el nombre de tu personaje: ");
+	printf("Ingresa el nombre de tu heroe: ");
 	fgets(jugador.nombre, sizeof(jugador.nombre), stdin);
 	jugador.nombre[strcspn(jugador.nombre, "\n")] = '\0';
-	
-	int opcion = 0;
-	do {
-		printf("\n=== MENU ===\n");
-		printf("1. Ver estadisticas\n");
-		printf("2. Buscar pelea\n");
-		printf("3. Salir del juego\n");
-		printf("Elige una opcion: ");
-		scanf("%d", &opcion);
-		getchar();
+	printf("P= Personaje ");
+	printf(" = Espacio en blanco ");
+	printf("#= Muro ");
+	printf("J= Jefe intermedio ");
+	printf("J= Jefe final \n");
+	char cmd;
+	while (jugador.vida > 0) {
+		mostrar_mapa();
+		mostrar_estadisticas(jugador);
+		printf("Mover (WASD), T = tienda, U = usar pocion, Q = salir\n> ");
+		scanf(" %c", &cmd);
+		int dx = 0, dy = 0;
+		if (cmd == 'w') dx = -1;
+		else if (cmd == 's') dx = 1;
+		else if (cmd == 'a') dy = -1;
+		else if (cmd == 'd') dy = 1;
+		else if (cmd == 'T' || cmd == 't') { tienda_objetos(&jugador); continue; }
+		else if (cmd == 'U' || cmd == 'u') { jugador = usar_consumible(&jugador); continue; }
+		else if (cmd == 'Q' || cmd == 'q') break;
 		
-		switch (opcion) {
-		case 1:
-			mostrar_estadisticas(jugador);
-			break;
-		case 2:
-			jugador = combatir(jugador, generar_enemigo());
-			break;
-		case 3:
-			printf("\u00a1Gracias por jugar!\n");
-			break;
-		default:
-			printf("Opcion invalida.\n");
+		int nx = jugador_x + dx;
+		int ny = jugador_y + dy;
+		if (mapa[nx][ny] == '#') continue;
+		
+		jugador_x = nx;
+		jugador_y = ny;
+		
+		if (mapa[nx][ny] == 'J') {
+			jugador = combatir(jugador, jefe_intermedio());
+			mapa[nx][ny] = ' ';
+		} else if (mapa[nx][ny] == 'F') {
+			jugador = combatir(jugador, jefe_final());
+			mapa[nx][ny] = ' ';
+		} else {
+			int prob = rand() % 100;
+			if (prob < PROB_ENEMIGO) {
+				jugador = combatir(jugador, generar_enemigo_aleatorio());
+			}
 		}
-		
-	} while (opcion != 3 && jugador.vida > 0);
+	}
 	
 	return 0;
 }
