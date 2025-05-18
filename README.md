@@ -13,6 +13,6 @@ En esta entrega se planificó la base del proyecto, definiéndola en **4 etapas 
 	2.  [**Requerimientos No Funcionales.**](https://github.com/IvanChiPolanco/Proyecto-Programacion-Estructurada/blob/4ae2c662b43102254edb49a6de5420bfdb8dcaaa/mapeoReqs/reqsNoFuncionales.md)
 	3. [**Casos De Uso.**](https://github.com/IvanChiPolanco/Proyecto-Programacion-Estructurada/blob/d58fd0054ecfa58cb177b9904dd714ac2d808c78/mapeoReqs/casosDeUso.md)
  - ***Definición del estándar de codificación.***
-	 1.   [**Definición clara y específica sobre el estándar que utilizará el equipo de trabajo.**]()
+	 1.   [**Definición clara y específica sobre el estándar que utilizará el equipo de trabajo.**](https://github.com/IvanChiPolanco/Proyecto-Programacion-Estructurada/blob/3d09fd5e7e176dae5784f01764d34da28d85a7ea/mapeoReqs/estandarCod.md)
  - ***Proceso de Desarrollo***
 	 1.  [**Descripción del proceso de desarrollo.**]()
