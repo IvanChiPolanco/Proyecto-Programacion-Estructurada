@@ -3,7 +3,7 @@ En esta entrega se planificó la base del proyecto, definiéndola en **4 etapas 
 
  - ***Definición inicial de requerimientos del sistema***
  
-	 1.    _**Antecedentes de la propuesta.**_ 
+	 1.    [_**Antecedentes de la propuesta.**_](https://github.com/IvanChiPolanco/Proyecto-Programacion-Estructurada/blob/77726dbac2c55f250a43b5a32b41596fd71a604a/reqSistema/antecedentes.md) 
 	 2.    _**Descripción del producto software.**_
 	 3.    _**Objetivos general y específicos del sistema.**_
 	 4.    _**Generar un diagrama de casos de uso, para representar la funcionalidad general del sistema.**_
