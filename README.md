@@ -4,11 +4,10 @@ En esta entrega se planificó la base del proyecto, definiéndola en **4 etapas 
  - ***Definición inicial de requerimientos del sistema***
  
 	 1.    [_**Antecedentes de la propuesta.**_](https://github.com/IvanChiPolanco/Proyecto-Programacion-Estructurada/blob/77726dbac2c55f250a43b5a32b41596fd71a604a/reqSistema/antecedentes.md) 
-	 2.    _**Descripción del producto software.**_
-	 3.    _**Objetivos general y específicos del sistema.**_
-	 4.    _**Generar un diagrama de casos de uso, para representar la funcionalidad general del sistema.**_
-	 5.    **Hacer una distinción clara entre los diferentes actores del sistema. (descripción de tipos de usuarios).**
-	 6.    **Elaborar las principales interfaces de usuario.**
+	 2.    [_**Descripción del producto software.**_](https://github.com/IvanChiPolanco/Proyecto-Programacion-Estructurada/blob/ffd5f75ff1a28ebc475a275fab080fae06596150/reqSistema/descripcionSoftware.md)
+	 3.    [_**Objetivos general y específicos del sistema.**_](https://github.com/IvanChiPolanco/Proyecto-Programacion-Estructurada/blob/ffd5f75ff1a28ebc475a275fab080fae06596150/reqSistema/objetivos.md)
+	 4.    [_**Actores y Diagrama de Casos de Uso.**_](https://github.com/IvanChiPolanco/Proyecto-Programacion-Estructurada/blob/ffd5f75ff1a28ebc475a275fab080fae06596150/reqSistema/casosdeUso.md)
+	 5.    [**Elaborar las principales interfaces de usuario.**](https://github.com/IvanChiPolanco/Proyecto-Programacion-Estructurada/blob/ffd5f75ff1a28ebc475a275fab080fae06596150/reqSistema/interfaces.md)
  - ***Mapeo de Requerimientos***
 	 1.    **Describir, en forma clara, los principales requerimientos funcionales y no funcionales del sistema.**
 	2.  **Elaborar los casos de uso para cada funcionalidad, donde se describa el proceso y las rutas de acción alternativas.**
