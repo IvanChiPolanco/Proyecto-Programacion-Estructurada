@@ -16,6 +16,7 @@ Uno de los puntos más interesantes del juego es que cada vez que se inicia una 
 
 A lo largo de este repositorio se irá observando el progreso, cambios, etc. alrededor del proyecto dividido en las distintas fases de entrega:
 - [**Propuesta de Proyecto.**](https://github.com/IvanChiPolanco/Proyecto-Programacion-Estructurada/tree/PropuestaProyecto)
+- [**Avances de Proyecto.**](https://github.com/IvanChiPolanco/Proyecto-Programacion-Estructurada/tree/AvancesProyecto)
 
 Integrantes:
  - Chi Polanco Iván Alejandro
